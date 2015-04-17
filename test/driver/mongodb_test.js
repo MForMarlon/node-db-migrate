@@ -170,6 +170,41 @@ driver.connect(config, internals, function(err, db) {
     }
   })
   .addBatch({
+      'update': {
+          topic: function() {
+              db.createCollection('event', function(err) {
+                  if(err) {
+                      return this.callback(err);
+                  }
+
+                  db.insert('event', {id: 2, title: 'title'}, function(err) {
+                      if(err) {
+                          return this.callback(err);
+                      }
+
+                      db.update('event', {id: 2}, {$set: {title: 'newtitle'}}, false, function(err) {
+                          if(err) {
+                              return this.callback(err);
+                          }
+                          db._find('event', {id: 2}, this.callback);
+                      }.bind(this));
+
+                  }.bind(this));
+
+              }.bind(this));
+          },
+
+          teardown: function() {
+              db.dropCollection('event', this.callback);
+          },
+
+          'with updated data' : function(err, data) {
+              assert.equal(data.length, 1);
+              assert.strictEqual(data[0].title, 'newtitle');
+          }
+      }
+  })
+  .addBatch({
     'insertMany': {
       topic: function() {
         db.createCollection('event', function(err, collection) {
@@ -200,6 +235,44 @@ driver.connect(config, internals, function(err, db) {
         assert.equal(data.length, 2);
       }
     }
+  })
+  .addBatch({
+      'multiUpdate': {
+          topic: function() {
+              db.createCollection('event', function(err) {
+                  if(err) {
+                      return this.callback(err);
+                  }
+
+                  db.insert('event', [{id: 2, title: 'title'},
+                      {id: 3, title: 'lol'},
+                      {id: 4, title: 'title'}], function(err) {
+                      if(err) {
+                          return this.callback(err);
+                      }
+
+                      db.update('event', {title: 'title'}, {$set: {title: 'newtitle'}}, true, function(err) {
+                          if(err) {
+                              return this.callback(err);
+                          }
+                          db._find('event', {title: 'newtitle'}, this.callback);
+                      }.bind(this));
+
+                  }.bind(this));
+
+              }.bind(this));
+          },
+
+          teardown: function() {
+              db.dropCollection('event', this.callback);
+          },
+
+          'with updated data' : function(err, data) {
+              assert.equal(data.length, 2);
+              assert.strictEqual(data[0].title, 'newtitle');
+              assert.strictEqual(data[1].title, 'newtitle');
+          }
+      }
   })
   .addBatch({
     'removeIndex': {
