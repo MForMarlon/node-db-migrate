@@ -123,6 +123,16 @@ vows.describe('migration').addBatch({
           assert.equal(actual, migration.defaultCoffeeTemplate());
         }
       },
+      'as coffee sql loader' : {
+        topic: function() {
+            var migration = new Migration(fileName, dirName, date, Migration.TemplateType.COFFEE_SQL_FILE_LOADER, internals);
+            return migration;
+          },
+        'should return default coffee template': function(migration) {
+          var actual = migration.getTemplate();
+          assert.equal(actual, migration.coffeeSqlFileLoaderTemplate());
+        }
+      },
       'as default javascript' : {
         topic: function() {
             var migration = new Migration(fileName, dirName, date, Migration.TemplateType.DEFAULT_JS, internals);
@@ -141,8 +151,8 @@ vows.describe('migration').addBatch({
 function createDateForTest() {
   var date = new Date();
   date.setUTCFullYear(2014);
-  date.setMonth('02');
   date.setUTCDate('20');
+  date.setUTCMonth('01');
   date.setUTCHours('14');
   date.setUTCMinutes('30');
   date.setUTCSeconds('50');

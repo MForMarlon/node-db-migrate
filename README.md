@@ -149,7 +149,7 @@ exports.up = function (db, callback) {
     db.createTable.bind(db, 'owners', {
       id: { type: 'int', primaryKey: true },
       name: 'string'
-    });
+    })
   ], callback);
 };
 
@@ -243,6 +243,10 @@ If you use MySQL, to be able to use multiple statements in your sql file, you ha
   }
 }
 ```
+
+You can also place it as a query string parameter into DATABASE_URL variable, as https://github.com/pwnall/node-parse-database-url allows passing them into config:
+
+    $ DATABASE_URL="mysql://DB_USER:DB_PASS@localhost/database-name?multipleStatements=true" db-migrate up
 
 ## Running Migrations
 
